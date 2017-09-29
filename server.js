@@ -9,10 +9,10 @@ app.post('/todos', (req, res) => {
     var todo = new Todo(req.body);
 
     todo.save().then(todo =>{
-        console.log(todo);
+       // console.log(todo);
         res.send(todo);
     },err=>{
-        res.send(err);
+        res.status(400).send(err);
     });
 });
 
