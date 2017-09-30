@@ -3,8 +3,16 @@ const expect = require('expect');
 const { app } = require('./../server');
 const { Todo } = require('./../model/todo');
 
+var todos = [{
+    title: 'dummy todo1'
+}, {
+    title: 'dummy todo 2'
+}];
+
 beforeEach(done => {
-    Todo.remove({}).then(() => done());
+    Todo.remove({}).then(() => {
+        return Todo.insertMany(todos);
+    }).then(() => done());
 });
 
 describe('POST  /todos', () => {
@@ -25,13 +33,13 @@ describe('POST  /todos', () => {
                     return done(err);
 
                 Todo.find().then(todos => {
-                    expect(todos.length).toBe(1);
+                    expect(todos.length).toBe(3);
                     done();
                 }).catch(e => {
                     done(e);
                 });
             });// end request
-         });
+    });
 
     it('should not add a new todo', done => {
         var todo = {
@@ -47,11 +55,32 @@ describe('POST  /todos', () => {
                     return done(err);
 
                 Todo.find().then(todos => {
-                    expect(todos.length).toBe(0);
+                    expect(todos.length).toBe(2);
                     done();
                 }).catch(e => {
                     done(e);
                 });
             });// end request
-         });
+    });
+});
+
+
+describe('GET /todos',()=>{
+
+    it('should return all todos',done =>{
+         request(app)
+            .get('/todos')
+            .expect(200)
+            .end((err, res) => {
+                if (err)
+                    return done(err);
+
+                Todo.find().then(todos => {
+                    expect(todos.length).toBe(2);
+                    done();
+                }).catch(e => {
+                    done(e);
+                });
+            });// end request
+    });
 });

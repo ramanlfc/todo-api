@@ -13,6 +13,27 @@ app.get('/todos', (req, res) => {
     });
 });
 
+const { ObjectId } = require('mongodb');
+
+app.get('/todos/:id', (req, res) => {
+    const id = req.params["id"];
+
+    if (!ObjectId.isValid(id)) {
+        res.status(400).send('invalid id');
+        return;
+    }
+
+    Todo.findById(id).then(todo => {
+        if (todo == null) {
+            res.status(404).send('todo not found');
+        }
+
+        res.status(200).send({ todo });
+    }).catch(e => {
+        res.status(500).send(e);
+    });
+});
+
 app.post('/todos', (req, res) => {
     var todo = new Todo(req.body);
 
