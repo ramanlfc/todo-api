@@ -45,6 +45,39 @@ app.post('/todos', (req, res) => {
     });
 });
 
+app.put('/todos/:id', (req, res) => {
+    const id = req.params["id"];
+
+    if (!ObjectId.isValid(id)) {
+        res.status(400).send('invalid id');
+        return;
+    }
+
+    var todo = {
+        title: req.body.title,
+        completed: req.body.completed
+    };
+
+    if (todo.completed) {
+        todo.completedAt = new Date();
+    } else {
+        todo.completed = 'false'
+    }
+
+    Todo.findByIdAndUpdate(id, { $set: todo }, { new: true }).then(todo => {
+        if (todo === null) {
+            res.status(404).send('no todo found for id: ' + id);
+        } else {
+            res.status(200).send({ todo });
+        }
+    }).catch(err => {
+        res.status(500).send(err);
+    });
+
+
+
+});
+
 app.delete('/todos/:id', (req, res) => {
     const id = req.params["id"];
 

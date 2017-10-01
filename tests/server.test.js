@@ -9,7 +9,8 @@ var todos = [{
     title: 'dummy todo1'
 }, {
     _id: new ObjectId(),
-    title: 'dummy todo 2'
+    title: 'dummy todo 2',
+    completed: true
 }];
 
 beforeEach(done => {
@@ -119,6 +120,43 @@ describe('GET /todos/id', () => {
     });
 
 });
+
+
+describe('PUT /todos/id', () => {
+
+    it('should update todo by id', done => {
+        request(app)
+            .put(`/todos/${todos[0]._id.toHexString()}`)
+            .send({
+                title: 'foo bar'
+            })
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.title).toBe('foo bar');
+            }).end(done);// end request
+    });
+
+
+    it('should return 404', done => {
+
+        var id = new ObjectId();
+        request(app)
+            .get(`/todos/${id.toHexString()}`)
+            .expect(404)
+            .end(done);// end request
+    });
+
+    it('should return 400', done => {
+
+        var id = new ObjectId();
+        request(app)
+            .get(`/todos/4654`)
+            .expect(400)
+            .end(done);// end request
+    });
+
+});
+
 
 
 describe('DELETE /todos/id', () => {
