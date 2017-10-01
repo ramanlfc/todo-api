@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Todo } = require('./model/todo.js');
+const { ObjectId } = require('mongodb');
 
 const app = express();
 app.use(bodyParser.json());
@@ -13,7 +14,6 @@ app.get('/todos', (req, res) => {
     });
 });
 
-const { ObjectId } = require('mongodb');
 
 app.get('/todos/:id', (req, res) => {
     const id = req.params["id"];
@@ -43,6 +43,26 @@ app.post('/todos', (req, res) => {
     }, err => {
         res.status(400).send(err);
     });
+});
+
+app.delete('/todos/:id', (req, res) => {
+    const id = req.params["id"];
+
+    if (!ObjectId.isValid(id)) {
+        res.status(400).send('invalid id');
+        return;
+    }
+
+    Todo.findByIdAndRemove(id).then(todo => {
+        if (todo === null) {
+            res.status(404).send('no todo found for id: ' + id);
+        } else {
+            res.status(200).send({ todo });
+        }
+    }).catch(err => {
+        res.status(500).send(err);
+    });
+
 });
 
 app.listen(3000, () => {
